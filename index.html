@@ -1,0 +1,115 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <meta name="application-name" content="HTML 5 audio player" />
+    <meta name="description" content="HTML 5 audio player" />
+
+    <title>HTML 5 music player</title>
+ 
+    <script type="text/javascript" src="public/javascript/jquery-1.6.2.min.js"></script> 
+    <script type="text/javascript" src="public/javascript/knockout-1.2.1.js"></script>
+    <script type="text/javascript" src="public/javascript/buzz.js"></script>
+
+    <script type="text/javascript">
+
+        var viewModel = {
+
+          command_call : function(){alert('command was called!'); return true;}
+
+        };
+
+        ko.applyBindings(viewModel);
+
+      </script>
+
+    <link rel="stylesheet" type="text/css" href="public/stylesheet/audio-player.css" />
+
+
+  </head>
+  <body>
+    <section id="container">
+      <header>
+        Audio player
+      </header>
+
+      <section id="content">
+        <section id="track_details">
+
+          <article id="graphic_details">
+	    <article id="inner_container">
+              <img src="" alt="graphic details"/>
+            </article>
+
+          </article>
+          <article id="info_details">
+
+            <article id="name" class="info_text">
+              <label for="name_value_field">Name:&nbsp;&nbsp;</label><span id="name_value_field" class="value_field">test name</span>
+            </article>
+            <article id="album" class="info_text">
+              <label for="album_value_field">Album:&nbsp;&nbsp;</label><span id="album_value_fied" class="value_field">test album</span>
+            </article>
+            <article id="genre" class="info_text">
+              <label for="genre_value_field">Genre:&nbsp;&nbsp;</label><span id="genre_value_field" class="value_field">test genre</span>
+            </article>
+            <article id="length" class="info_text">
+              <label for="length_value_field">Length:&nbsp;&nbsp;</label><span id="length_value_field" class="value_field">test length</span>
+            </article>
+            <article id="year" class="info_text">
+              <label for="year_value_field">Year:&nbsp;&nbsp;</label><span id="year_value_field" class="value_field">test year</span>
+            </article>
+
+          </article>
+
+        </section> <!-- audio details and info -->
+        <section id="player">
+          <section id="audio_stuff">
+            <audio controls="controls">
+              <!--source src="horse.ogg" type="audio/ogg" /-->
+              <!--source src="horse.mp3" type="audio/mp3" /-->
+              Your browser does not support the audio element.
+            </audio>
+          </section>
+          <section id="controls">
+            <ul>
+              <li class="control_command">
+                <a href="#"><span class="first_letter">r</span>ewind</a>
+              </li>
+              <li class="control_command">
+                <a href="#"><span class="first_letter">s</span>top</a>
+              <li class="control_command">
+                <a href="#" data-bind="click: command_call"><span class="first_letter">p</span>lay</a>
+              </li>
+              <li class="control_command">
+                <a href="#"><span class="first_letter">f</span>orward</a>
+              </li>
+            </ul>
+
+          </section> <!-- controls -->
+        </section> <!-- player and player controls -->
+      </section> <!-- content -->
+    
+    <section class="hidden"> <!-- this is just a way to separate visual code from none visual conf code -->
+
+      <!--script type="text/javascript">
+
+        var viewModel = {
+        
+          command_call : function(){alert('command was called!'); return true;}
+
+        };
+
+        ko.applyBindings(viewModel);
+
+      </script-->
+
+
+    </section> <!-- hidden -->
+
+    <footer>
+    </footer>
+   </section> <!-- container -->
+  </body>
+</html>
+
+

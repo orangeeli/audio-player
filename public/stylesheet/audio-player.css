@@ -1,0 +1,29 @@
+/* html5-audio-player.css */
+
+/* css reset */
+* { margin: 0px; padding: 0px; }
+
+#container {font-size: 0.625em; font-family: verdana; margin: 0 auto; min-width: 500px; width: 60em;}
+
+header {font-size: 2em; padding-top:10em; padding-bottom: 1em;}
+ 
+#track_details {padding-bottom: 1em; border-bottom: 1px solid #b0b0b0;}
+#graphic_details {float: left; padding-top: .5em;}
+#inner_container {border: .1em solid #f0f0f0; margin: 0 auto;}
+#graphic_details img {position: relative;}
+#info_details {padding-left: .5em; margin-left: 20em; /*width: 37em;*/}
+.info_text {font-size: 1.5em; padding: .5em 0em;}
+.info_text label {font-weight: bold;}
+#player {padding-top: 1em;}
+#audio_stuff{}
+
+#controls {padding-top: 1em;}
+#controls ul {}
+#controls li {list-style-type: none; display: inline;}
+
+.control_command a {font-size: .9em; padding: .5em; color: #000; border: 1px solid #b0b0b0;}
+.control_command a:link {text-decoration: none; color: #000; }
+.control_command a:hover {text-decoration: none; color: #b0b0b0;}
+.control_command a:visited {text-decoration: none;}
+
+.first_letter {font-weight: bold;}
