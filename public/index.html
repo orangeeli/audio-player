@@ -1,6 +1,7 @@
 <!DOCTYPE HTML>
 <html>
   <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
     <meta name="application-name" content="HTML 5 audio player" />
     <meta name="description" content="HTML 5 audio player" />
 
@@ -23,26 +24,31 @@
 
           <article id="graphic_details">
 	    <article id="inner_container">
-              <img src="" alt="graphic details"/>
+              <img data-bind="src: currentTrack.image" alt="graphic details"/>
             </article>
 
           </article>
           <article id="info_details">
 
             <article id="name" class="info_text">
-              <label for="name_value_field">Name:&nbsp;&nbsp;</label><span id="name_value_field" class="value_field">test name</span>
+              <label for="name_value_field">Name:&nbsp;&nbsp;</label>
+              <span id="name_value_field" class="value_field" data-bind="text: currentTrack.name"></span>
             </article>
             <article id="album" class="info_text">
-              <label for="album_value_field">Album:&nbsp;&nbsp;</label><span id="album_value_fied" class="value_field">test album</span>
+              <label for="album_value_field">Album:&nbsp;&nbsp;</label>
+              <span id="album_value_fied" class="value_field" data-bind="text: currentTrack.album"></span>
             </article>
             <article id="genre" class="info_text">
-              <label for="genre_value_field">Genre:&nbsp;&nbsp;</label><span id="genre_value_field" class="value_field">test genre</span>
+              <label for="genre_value_field">Genre:&nbsp;&nbsp;</label>
+              <span id="genre_value_field" class="value_field" data-bind="text: currentTrack.genre"></span>
             </article>
-            <article id="length" class="info_text">
-              <label for="length_value_field">Length:&nbsp;&nbsp;</label><span id="length_value_field" class="value_field">test length</span>
-            </article>
+            <!--article id="length" class="info_text">
+              <label for="length_value_field">Length:&nbsp;&nbsp;</label>
+              <span id="length_value_field" class="value_field" data-bind="text: currentTrack.length">test length</span>
+            </article-->
             <article id="year" class="info_text">
-              <label for="year_value_field">Year:&nbsp;&nbsp;</label><span id="year_value_field" class="value_field">test year</span>
+              <label for="year_value_field">Year:&nbsp;&nbsp;</label>
+              <span id="year_value_field" class="value_field" data-bind="text: currentTrack.year"></span>
             </article>
 
           </article>
@@ -51,12 +57,10 @@
         <section id="player">
           <section id="audio_stuff">
             <audio controls="controls" data-bind="template: {name:'playlistTemplate', foreach:playlist}">
-              <!--source src="horse.ogg" type="audio/ogg" /-->
-              <!--source src="horse.mp3" type="audio/mp3" /-->
               Your browser does not support the audio element.
             </audio>
             <script id="playlistTemplate" type="text/x-jquery-tmpl">
-              <source src"{$data.url}" type="{$data.type}" />
+              <source src="${$data.url}" type="${$data.type}" />
             </script>
           </section>
           <section id="controls">
@@ -117,17 +121,76 @@
           next : function(){alert('next!')},
           
           playlist : ko.observableArray(),
-          addTrack : function(){alert('add track');},
-          currentTrack : {}
+          addTrack : function(track){
+                       this.playlist.push(track);
+                     },
+          currentTrack : new track("default name",'default artist','default album','default genre','default year', 'url', 'type', 'picture')
+          /*currentTrack : ko.observable('current name')*/
         };
         
         ko.applyBindings(viewModel);
 
+        viewModel.addTrack(new track('NYC', 'Bear Bot', '', 'Electro Pop', '2009', 'tracks/BEARBOT-NYC.mp3', 'audio/mp3', 'images/coolMonkey.png'));
+        viewModel.addTrack(new track('Combination of pizza hut and taco bell', 'Valerna', '', 'Electro Pop', '2009', 
+                                       'tracks/Valerna-Combination-Pizza-Hut-And-Taco-Bell.mp3', 'audio/mp3', 'images/coolMonkey.png'));
+
         $(document).ready(function(){
-          viewModel.addTrack(new track());
-          viewModel.addTrack(new track());
-          viewModel.addTrack(new track());
-          viewModel.addTrack(new track());
+
+          // todo: begging to be wrapped in a nice pattern
+
+          // Preload the sound
+          // auto, metadata, none
+          buzz.defaults.preload = 'auto';
+          // Play the sound when ready
+          // bool
+          buzz.defaults.autoplay = false;
+          // Loop the sound
+          // bool
+          buzz.defaults.loop = false;
+          // value to display when a time convertion is impossible
+          buzz.defaults.placeholder = '--';
+          // Duration of a fading effect
+          // milliseconds
+          buzz.defaults.duration = 5000; 
+          // Audio formats of your files
+          buzz.defaults.formats = ['ogg', 'mp3', 'aac', 'wav'];
+                    
+          if (!buzz.isSupported()) {
+            alert("Your browser is too old, time to update!");
+          }
+
+          if (!buzz.isWAVSupported()) {
+            alert("Your browser doesn't support WAV Format.");
+          }
+ 
+          if (!buzz.isOGGSupported()) {
+            alert("Your browser doesn't support OGG Format.");
+          }
+
+          if (!buzz.isAACSupported()) {
+            alert("Your browser doesn't support AAC Format.");
+          }
+
+          if (!buzz.isMP3Supported()) {
+            alert("Your browser doesn't support MP3 Format.");
+          }
+          
+          myGroup = new buzz.group([ 
+            new buzz.sound("tracks/BEARBOT-NYC", { formats: [ 'mp3' ] }),
+            new buzz.sound("tracks/Valerna-Combination-Pizza-Hut-And-Taco-Bell", { formats: [ 'mp3' ] })
+          ]);
+          
+          myGroup.play();
+
+          sounds = myGroup.getSounds();
+ 
+          myGroup.bind("playing", function(e) {
+            alert('new song is playing');
+          });
+          
+          /*for(sound in sounds){
+	    alert(sound.getStateCode());
+          }*/
         });
 
       </script>
