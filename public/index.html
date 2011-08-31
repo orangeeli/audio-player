@@ -6,25 +6,11 @@
 
     <title>HTML 5 music player</title>
  
-    <script type="text/javascript" src="public/javascript/jquery-1.6.2.min.js"></script> 
-    <script type="text/javascript" src="public/javascript/knockout-1.2.1.js"></script>
-    <script type="text/javascript" src="public/javascript/buzz.js"></script>
-
-    <script type="text/javascript">
-
-        var viewModel = {
-
-          command_call : function(){alert('command was called!'); return true;}
-
-        };
-
-        ko.applyBindings(viewModel);
-
-      </script>
-
-    <link rel="stylesheet" type="text/css" href="public/stylesheet/audio-player.css" />
-
-
+    <script type="text/javascript" src="javascripts/jquery-1.6.2.min.js"></script> 
+    <script type="text/javascript" src="javascripts/jquery.tmpl.min.js"></script>
+    <script type="text/javascript" src="javascripts/knockout-1.2.1.js"></script>
+    <script type="text/javascript" src="javascripts/buzz.js"></script>
+    <link rel="stylesheet" type="text/css" href="stylesheets/audio-player.css" />
   </head>
   <body>
     <section id="container">
@@ -64,47 +50,87 @@
         </section> <!-- audio details and info -->
         <section id="player">
           <section id="audio_stuff">
-            <audio controls="controls">
+            <audio controls="controls" data-bind="template: {name:'playlistTemplate', foreach:playlist}">
               <!--source src="horse.ogg" type="audio/ogg" /-->
               <!--source src="horse.mp3" type="audio/mp3" /-->
               Your browser does not support the audio element.
             </audio>
+            <script id="playlistTemplate" type="text/x-jquery-tmpl">
+              <source src"{$data.url}" type="{$data.type}" />
+            </script>
           </section>
           <section id="controls">
             <ul>
               <li class="control_command">
-                <a href="#"><span class="first_letter">r</span>ewind</a>
+                <button data-bind="click: rewind"><span class="first_letter">r</span>ewind</button>
               </li>
               <li class="control_command">
-                <a href="#"><span class="first_letter">s</span>top</a>
-              <li class="control_command">
-                <a href="#" data-bind="click: command_call"><span class="first_letter">p</span>lay</a>
+                <button data-bind="click: stop"><span class="first_letter">s</span>top</button>
               </li>
               <li class="control_command">
-                <a href="#"><span class="first_letter">f</span>orward</a>
-                <button data-bind="click: command_call" >Click me</button>
+                <button data-bind="click: play"><span class="first_letter">p</span>lay</button>
+              </li>
+              <li class="control_command">
+                <button data-bind="click: forward"><span class="first_letter">f</span>orward</button>
               </li>
             </ul>
-
+          
+             <ul>
+              <li class="control_command">
+                <button data-bind="click: next"><span class="first_letter">n</span>ext track</button>
+              </li>
+              <li class="control_command">
+                <button data-bind="click: previous"><span class="first_letter">p</span>revious track</button>
+              </li>
+            </ul>
+ 
           </section> <!-- controls -->
         </section> <!-- player and player controls -->
       </section> <!-- content -->
     
     <section class="hidden"> <!-- this is just a way to separate visual code from none visual conf code -->
+      
+      <script type="text/javascript">
 
-      <!--script type="text/javascript">
+        function track(trackName, trackArtist, trackAlbum, trackGenre, trackYear, trackUrl, trackType, trackImageUrl){
+          return {
+            name : trackName,
+            artist : trackArtist,
+            album : trackAlbum,
+            genre : trackGenre,
+            year : trackYear,
+            type : trackType,
+            url : trackUrl,
+            image : trackImageUrl
+          }
+        }
 
         var viewModel = {
-        
-          command_call : function(){alert('command was called!'); return true;}
-
+          buttonClick : function(){
+            alert('command was called!');
+          },
+          play : function(){alert('play!')},
+          stop : function(){alert('stop!')},
+          rewind : function(){alert('rewind!')},
+          forward : function(){alert('forward!')},
+          previous : function(){alert('previous!')},
+          next : function(){alert('next!')},
+          
+          playlist : ko.observableArray(),
+          addTrack : function(){alert('add track');},
+          currentTrack : {}
         };
-
+        
         ko.applyBindings(viewModel);
 
-      </script-->
+        $(document).ready(function(){
+          viewModel.addTrack(new track());
+          viewModel.addTrack(new track());
+          viewModel.addTrack(new track());
+          viewModel.addTrack(new track());
+        });
 
-
+      </script>
     </section> <!-- hidden -->
 
     <footer>
