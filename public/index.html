@@ -11,6 +11,7 @@
     <script type="text/javascript" src="javascripts/jquery.tmpl.min.js"></script>
     <script type="text/javascript" src="javascripts/knockout-1.2.1.js"></script>
     <script type="text/javascript" src="javascripts/buzz.js"></script>
+    <script type="text/javascript" src="javascripts/application.js"></script>
     <link rel="stylesheet" type="text/css" href="stylesheets/audio-player.css" />
   </head>
   <body>
@@ -96,7 +97,7 @@
       
       <script type="text/javascript">
 
-        function track(trackName, trackArtist, trackAlbum, trackGenre, trackYear, trackUrl, trackType, trackImageUrl){
+        function track(trackName, trackArtist, trackAlbum, trackGenre, trackYear, trackUrl, trackType, trackImageUrl, trackSound){
           return {
             name : trackName,
             artist : trackArtist,
@@ -105,92 +106,68 @@
             year : trackYear,
             type : trackType,
             url : trackUrl,
-            image : trackImageUrl
+            image : trackImageUrl,
+            sound : trackSound
           }
         }
-
+    
         var viewModel = {
-          buttonClick : function(){
-            alert('command was called!');
-          },
-          play : function(){alert('play!')},
-          stop : function(){alert('stop!')},
-          rewind : function(){alert('rewind!')},
-          forward : function(){alert('forward!')},
-          previous : function(){alert('previous!')},
-          next : function(){alert('next!')},
-          
-          playlist : ko.observableArray(),
-          addTrack : function(track){
-                       this.playlist.push(track);
-                     },
-          currentTrack : new track("default name",'default artist','default album','default genre','default year', 'url', 'type', 'picture')
-          /*currentTrack : ko.observable('current name')*/
-        };
+      buttonClick : function(){
+        alert('command was called!');
+      },
+      play : function(){
+        alert('play!'),
+        this.currentTrack.play();
+      },
+      stop : function(){
+        alert('stop!');
+        this.currentTrack.stop();
+      },
+      rewind : function(){alert('rewind!')},
+      forward : function(){alert('forward!')},
+      previous : function(){
+        alert('previous!');
+        this.playerCounter++;
         
-        ko.applyBindings(viewModel);
+      },
+      next : function(){alert('next!')},
+          
+      playlist : ko.observableArray(),
+      playerCounter : ko.observable(0),
+      addTrack : function(track){
+        this.playlist.push(track);
+      },
+      currentTrack : null
+        // new track("default name",'default artist','default album','default genre','default year', 'url', 'type', 'picture')
+        /*currentTrack : ko.observable('current name')*/
+    };
 
-        viewModel.addTrack(new track('NYC', 'Bear Bot', '', 'Electro Pop', '2009', 'tracks/BEARBOT-NYC.mp3', 'audio/mp3', 'images/coolMonkey.png'));
-        viewModel.addTrack(new track('Combination of pizza hut and taco bell', 'Valerna', '', 'Electro Pop', '2009', 
-                                       'tracks/Valerna-Combination-Pizza-Hut-And-Taco-Bell.mp3', 'audio/mp3', 'images/coolMonkey.png'));
+   var bear = new buzz.sound("tracks/BEARBOT-NYC", { formats: [ 'mp3' ] });
+   var valerna = new buzz.sound("tracks/Valerna-Combination-Pizza-Hut-And-Taco-Bell", { formats: [ 'mp3' ] });
+ 
+    viewModel.addTrack(new track('NYC', 'Bear Bot', '', 'Electro Pop', '2009', 'tracks/BEARBOT-NYC.mp3', 'audio/mp3', 'images/coolMonkey.png', bear));
+    viewModel.addTrack(new track('Combination of pizza hut and taco bell', 'Valerna', '', 'Electro Pop', '2009', 
+                                       'tracks/Valerna-Combination-Pizza-Hut-And-Taco-Bell.mp3', 'audio/mp3', 'images/coolMonkey.png', valerna));
+
+    viewModel.currentTrack = bear;
+    ko.applyBindings(viewModel);
+        
 
         $(document).ready(function(){
 
-          // todo: begging to be wrapped in a nice pattern
-
-          // Preload the sound
-          // auto, metadata, none
-          buzz.defaults.preload = 'auto';
-          // Play the sound when ready
-          // bool
-          buzz.defaults.autoplay = false;
-          // Loop the sound
-          // bool
-          buzz.defaults.loop = false;
-          // value to display when a time convertion is impossible
-          buzz.defaults.placeholder = '--';
-          // Duration of a fading effect
-          // milliseconds
-          buzz.defaults.duration = 5000; 
-          // Audio formats of your files
-          buzz.defaults.formats = ['ogg', 'mp3', 'aac', 'wav'];
-                    
-          if (!buzz.isSupported()) {
-            alert("Your browser is too old, time to update!");
+          // todo: begging to be wrapped in a nice pattern chain of responsability
+        var runner = new ChainManager({});
+        runner.addChainStep(new ValidateBuzzSuportStep());
+        runner.addChainStep(new SetBuzzOptionsStep());
+        runner.addCompleteHandler(function(isSuccessful, message) {
+          if(isSuccessful){
+            alert('chain successfull');
+          }else{
+            var logMessage = "Couldn't complete bootstrap sequence: " + message;
+            alert(logMessage);
           }
-
-          if (!buzz.isWAVSupported()) {
-            alert("Your browser doesn't support WAV Format.");
-          }
- 
-          if (!buzz.isOGGSupported()) {
-            alert("Your browser doesn't support OGG Format.");
-          }
-
-          if (!buzz.isAACSupported()) {
-            alert("Your browser doesn't support AAC Format.");
-          }
-
-          if (!buzz.isMP3Supported()) {
-            alert("Your browser doesn't support MP3 Format.");
-          }
-          
-          myGroup = new buzz.group([ 
-            new buzz.sound("tracks/BEARBOT-NYC", { formats: [ 'mp3' ] }),
-            new buzz.sound("tracks/Valerna-Combination-Pizza-Hut-And-Taco-Bell", { formats: [ 'mp3' ] })
-          ]);
-          
-          myGroup.play();
-
-          sounds = myGroup.getSounds();
- 
-          myGroup.bind("playing", function(e) {
-            alert('new song is playing');
-          });
-          
-          /*for(sound in sounds){
-	    alert(sound.getStateCode());
-          }*/
+        });
+        runner.processChain();
         });
 
       </script>
