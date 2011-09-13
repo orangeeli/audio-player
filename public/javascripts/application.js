@@ -62,84 +62,65 @@
   };
 })();
 
-
-var IChainRunner = Class.extend({
-  init: function(isDancing){
-    this.dancing = isDancing;
-  },
-
-  addChainStep : function(step/*IChainStep*/){
-  },
-  processChain : function(){
-  },
-  chainComplete : function(){
-  },
-  chainInterruption : function(message/* string */){
-  },
-  getLastRunStepIndex : function(){
-  },
-  addCompleteHandler: function(/*ChainExitEvent.Handler*/ handler){
-    /* must return HandlerRegistration*/
+var IChainManager = Class.extend({
+  init: function(){},
+  addChainHandler : function(handler){},
+  processChain : function(){},
+  chainComplete : function(){},
+  chainInterruption : function(message){},
+  getLastRunHandlerIndex : function(){},
+  addCompleteHandler: function(handler){
   },
 });
- 
-
-var ChainManager = IChainRunner.extend({
-
-  init: function(/**/contextData){
+var ChainManager = IChainManager.extend({
+  init: function(contextData){
     this.context = new ChainContext(contextData);
     this.context.setRunner(this);
   },
   processChain : function(){
-    this.firstStep.processStep();
+    this.firstHandler.processHandler();
   },	
-  addChainStep : function(/*IChainStep*/ step){
-    if(!this.firstStep){
-      this.firstStep = step;
+  addChainHandler : function(handler){
+    if(!this.firstHandler){
+      this.firstHandler = handler;
     }
-    if(this.lastStep){
-      this.lastStep.setNextStep(step);
+    if(this.lastHandler){
+      this.lastHandler.setNextHandler(handler);
     } 
-    this.lastStep = step;
-    this.lastStep.setContext(this.context);
+    this.lastHandler = handler;
+    this.lastHandler.setContext(this.context);
   },
-  addCompleteHandler: function(/*ChainExitEvent.Handler*/ handler){
-    /*HandlerRegistration*/
-    /*return eventBus.addHandler(ChainExitEvent.TYPE, handler);*/
+  addCompleteHandler: function(handler){
     $('body').bind('chainexitevent', handler);    
   },
   chainComplete : function(){
-    //eventBus.fireEvent(new ChainExitEvent(true));
     $('body').trigger('chainexitevent', [true]);
   },
-  chainInterruption : function(/*String*/ message) {
+  chainInterruption : function(message) {
     $('body').trigger('chainExitEvent', [false, message]);
   },
-  getLastRunStepIndex : function() {
-    return this.context.getLastRunStepIndex();
+  getLastRunHandlerIndex : function() {
+    return this.context.getLastRunHandlerIndex();
   },
   getContextData : function(){
     return this.context.getContextData();
   }
 });
-
 var IChainContext = Class.extend({
   init : function(){},
   chainComplete : function(){},
-  chainInterruption : function(/*String*/ message){},
-  setRunner : function(/*IChainRunner<T>*/ runner){},
-  incrementStepCounter : function(){},
-  getLastRunStepIndex : function(){},
+  chainInterruption : function(message){},
+  setRunner : function(runner){},
+  incrementHandlerCounter : function(){},
+  getLastRunHandlerIndex : function(){},
   getContextData : function(){},
   setContextData : function(data){}
 });
-
 var ChainContext = IChainContext.extend({
-
   init: function(data){
     this.data = data;
   },
-  setRunner : function(/*IChainRunner<T>*/ runner){
+  setRunner : function(runner){
     this.runner = runner;
   },
   getContextData : function(){
@@ -148,93 +129,80 @@ var ChainContext = IChainContext.extend({
   setContextData : function(data) {
     this.data = data;
   },
-  incrementStepCounter : function(){
-    this.currentStepIndex++;
+  incrementHandlerCounter : function(){
+    this.currentHandlerIndex++;
   },
-  getLastRunStepIndex : function(){
-    return this.currentStepIndex;
+  getLastRunHandlerIndex : function(){
+    return this.currentHandlerIndex;
   },
   chainComplete : function() {
     this.runner.chainComplete();
   },
-  chainInterruption : function(/*String*/ message) {
+  chainInterruption : function(message) {
     this.runner.chainInterruption(message);
   }
 });
-
-var IChainStep = Class.extend({
+var IChainHandler = Class.extend({
   init : function(){},
-  processStep : function(){},
-  setContext : function(/*IChainContext<T>*/ context){},
-  setNextStep : function(/*IChainStep<T>*/ step){},
-  getNextStep : function(){}
+  processHandler : function(){},
+  setContext : function(context){},
+  setNextHandler : function(handler){},
+  getNextHandler : function(){}
 });
-
-var AbstractStep = IChainStep.extend({
+var AbstractHandler = IChainHandler.extend({
   init : function(){},	
-  processStep : function(){},
+  processHandler : function(){},
   processNext : function(){
-    if(!this.nextStep){
+    if(!this.nextHandler){
       this.context.chainComplete();
     }else{
-      this.context.incrementStepCounter();
-      this.nextStep.processStep();
+      this.context.incrementHandlerCounter();
+      this.nextHandler.processHandler();
     } 
   },
-  interruptStep : function(/*String*/ message){
+  interruptHandler : function(message){
     this.context.chainInterruption(message);
   },
-  setContext : function(/*IChainContext<T>*/ context){
+  setContext : function(context){
     this.context = context;
   },
   getContext : function(){
     return this.context;
   },
-  setNextStep : function(/*IChainStep<T>*/ step){
-    this.nextStep = step;
+  setNextHandler : function(handler){
+    this.nextHandler = handler;
   },
-  getNextStep : function(){
-    return this.nextStep;
+  getNextHandler : function(){
+    return this.nextHandler;
   },
   getContextData : function(){
     return this.context.getContextData();
   }
 });
-
-var ValidateBuzzSuportStep = AbstractStep.extend({
+var ValidateBuzzSuportHandler = AbstractHandler.extend({
   init : function(){},
-  processStep : function(){
-    alert('ValidateBuzzSuportStep');
+  processHandler : function(){
     if (!buzz.isSupported()) {
-      alert("Your browser is too old, time to update!");
       this.interruptStep("Your browser is too old, time to update!");
     }
     if (!buzz.isWAVSupported()) {
-      alert("Your browser doesn't support WAV Format.");
-      this.interruptStep("Your browser doesn't support WAV Format.");
+      this.interruptHandler("Your browser doesn't support WAV Format.");
     }
     if (!buzz.isOGGSupported()) {
-      alert("Your browser doesn't support OGG Format.");
-      this.interruptStep("Your browser doesn't support OGG Format.");
+      this.interruptHandler("Your browser doesn't support OGG Format.");
     }
     if (!buzz.isAACSupported()) {
-      alert("Your browser doesn't support AAC Format.");
-      this.interruptStep("Your browser doesn't support AAC Format.");
+      this.interruptHandler("Your browser doesn't support AAC Format.");
     }
     if (!buzz.isMP3Supported()) {
-      alert("Your browser doesn't support MP3 Format.");
-      this.interruptStep("Your browser doesn't support MP3 Format.");
+      this.interruptHandler("Your browser doesn't support MP3 Format.");
     }
     this.processNext();
   }
 });
-
-var SetBuzzOptionsStep = AbstractStep.extend({
+var SetBuzzOptionsHandler = AbstractHandler.extend({
   init : function(){},
-  processStep : function(){
-  
-    alert('SetBuzzOptionsStep');
-
+  processHandler : function(){
     // Preload the sound
     // auto, metadata, none
     buzz.defaults.preload = 'auto';
@@ -254,30 +222,130 @@ var SetBuzzOptionsStep = AbstractStep.extend({
     this.processNext();
   }
 });
-
-var SetViewModel = AbstractStep.extend({
+var SetViewModelHandler = AbstractHandler.extend({
   init : function(){},
-  processStep : function(){
-    var viewModel = {
-      buttonClick : function(){
-        alert('command was called!');
+  processHandler : function(){
+    function track(trackName, trackArtist, trackAlbum, trackGenre, trackYear, trackUrl, trackType, trackImageUrl, trackSound){
+      return {
+        name : trackName,
+        artist : trackArtist,
+        album : trackAlbum,
+        genre : trackGenre,
+        year : trackYear,
+        type : trackType,
+        url : trackUrl,
+        image : trackImageUrl,
+        sound : trackSound
+      }
+    }
+    
+
+    var changeTrackObj = {
+      changeTrackPrev : function(playCounter, clb){
+          return function(){
+            if((playCounter-1) < 0){
+              //this.next();
+              clb();
+              return;
+            }
+            playCounter = playCounter-1;
+            return playCounter;
+          }
       },
-      play : function(){alert('play!')},
-      stop : function(){alert('stop!')},
+
+      changeTrackNext : function(playCounter, playListLength, clb){
+          return function(){
+            if((playCounter+1) > playListLength){
+              //this.previous();
+              clb();
+              return;
+            }
+            playCounter = playCounter+1;
+            return playCounter;
+          }
+      }
+    };
+
+    var viewModel = {
+      play : function(){
+        this.currentTrack.sound.play();
+      },
+      stop : function(){
+        this.currentTrack.sound.stop();
+      },
       rewind : function(){alert('rewind!')},
       forward : function(){alert('forward!')},
-      previous : function(){alert('previous!')},
-      next : function(){alert('next!')},
-          
-      playlist : ko.observableArray(),
+      previous : function(){
+        var clbPrev = (function(viewM, pos){
+          return function(){
+            viewM.changeTrack(null, pos)
+          }
+        }(this, this.playlist.length-1));
+        this.changeTrack(changeTrackObj.changeTrackPrev(this.playerCounter, clbPrev));
+      },
+      next : function(){
+        var clbNext = (function(viewM, pos){
+          return function(){
+            viewM.changeTrack(null, pos);
+          }
+        }(this, 0));
+        playListLength = this.playlist.length-1;
+        this.changeTrack(changeTrackObj.changeTrackNext(this.playerCounter, playListLength, clbNext));
+      },
+      continuousPlay : true,    
+      playlist : [],//ko.observableArray(),
+      playerCounter : 0, //ko.observable(0),
       addTrack : function(track){
         this.playlist.push(track);
       },
-      currentTrack : new track("default name",'default artist','default album','default genre','default year', 'url', 'type', 'picture')
-        /*currentTrack : ko.observable('current name')*/
+      removeTrack : function(){
+        this.playlist.pop(track);
+      },
+      /*currentTrack : ko.observable(),*/
+      changeTrack : function(f, pos){
+        var trackNumber = typeof f == "function" ? f(): pos;
+        if(typeof trackNumber == "undefined"){
+          // this guard shouldn't be needed. understand why this method is called twice and why the second the values come undefined
+          return;
+        }
+        // stop current music
+        this.stop();
+        this.currentTrack = this.playlist[trackNumber];
+        this.playerCounter = trackNumber;
+        // start playing new one if it was playing some previously
+        this.play();
+      }
     };
+
+    viewModel.currentTrack = ko.observable();
+
+    var bear = new buzz.sound("tracks/BEARBOT-NYC", { formats: [ 'mp3' ] });
+    var valerna = new buzz.sound("tracks/Valerna-Combination-Pizza-Hut-And-Taco-Bell", { formats: [ 'mp3' ] });
+   
+    bear.bind("ended", function(e) {
+      $('body').trigger("trackEnded");
+    });
+   
+    valerna.bind("ended", function(e) {
+      $('body').trigger("trackEnded");
+    });
+
+    $('body').bind('trackEnded', function(){
+      if(viewModel.continuousPlay){
+        viewModel.next();
+        viewModel.play();
+      }
+    });
+
+    var bearTrack = new track('NYC', 'Bear Bot', '', 'Electro Pop', '2009', 'tracks/BEARBOT-NYC.mp3', 'audio/mp3', 'images/coolMonkey.png', bear);
+    var valernaTrack = new track('Combination of pizza hut and taco bell', 'Valerna', '', 'Electro Pop', '2009', 
+                                       'tracks/Valerna-Combination-Pizza-Hut-And-Taco-Bell.mp3', 'audio/mp3', 'images/coolMonkey.png', valerna);
+    viewModel.addTrack(bearTrack);
+    viewModel.addTrack(valernaTrack);
+
+    viewModel.currentTrack = bearTrack;
     ko.applyBindings(viewModel);
-    this._super.processNext();
+    this.processNext();
   }
 });
 

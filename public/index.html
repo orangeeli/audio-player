@@ -12,6 +12,7 @@
     <script type="text/javascript" src="javascripts/knockout-1.2.1.js"></script>
     <script type="text/javascript" src="javascripts/buzz.js"></script>
     <script type="text/javascript" src="javascripts/application.js"></script>
+    <script type="text/javascript" src="javascripts/entry_point.js"></script>
     <link rel="stylesheet" type="text/css" href="stylesheets/audio-player.css" />
   </head>
   <body>
@@ -57,12 +58,15 @@
         </section> <!-- audio details and info -->
         <section id="player">
           <section id="audio_stuff">
-            <audio controls="controls" data-bind="template: {name:'playlistTemplate', foreach:playlist}">
+            <!--audio controls="controls">
               Your browser does not support the audio element.
-            </audio>
-            <script id="playlistTemplate" type="text/x-jquery-tmpl">
+            </audio-->
+            <!--audio controls="controls" data-bind="template: {name:'playlistTemplate', foreach:playlist}">
+              Your browser does not support the audio element.
+            </audio-->
+            <!--script id="playlistTemplate" type="text/x-jquery-tmpl">
               <source src="${$data.url}" type="${$data.type}" />
-            </script>
+            </script-->
           </section>
           <section id="controls">
             <ul>
@@ -95,82 +99,6 @@
     
     <section class="hidden"> <!-- this is just a way to separate visual code from none visual conf code -->
       
-      <script type="text/javascript">
-
-        function track(trackName, trackArtist, trackAlbum, trackGenre, trackYear, trackUrl, trackType, trackImageUrl, trackSound){
-          return {
-            name : trackName,
-            artist : trackArtist,
-            album : trackAlbum,
-            genre : trackGenre,
-            year : trackYear,
-            type : trackType,
-            url : trackUrl,
-            image : trackImageUrl,
-            sound : trackSound
-          }
-        }
-    
-        var viewModel = {
-      buttonClick : function(){
-        alert('command was called!');
-      },
-      play : function(){
-        alert('play!'),
-        this.currentTrack.play();
-      },
-      stop : function(){
-        alert('stop!');
-        this.currentTrack.stop();
-      },
-      rewind : function(){alert('rewind!')},
-      forward : function(){alert('forward!')},
-      previous : function(){
-        alert('previous!');
-        this.playerCounter++;
-        
-      },
-      next : function(){alert('next!')},
-          
-      playlist : ko.observableArray(),
-      playerCounter : ko.observable(0),
-      addTrack : function(track){
-        this.playlist.push(track);
-      },
-      currentTrack : null
-        // new track("default name",'default artist','default album','default genre','default year', 'url', 'type', 'picture')
-        /*currentTrack : ko.observable('current name')*/
-    };
-
-   var bear = new buzz.sound("tracks/BEARBOT-NYC", { formats: [ 'mp3' ] });
-   var valerna = new buzz.sound("tracks/Valerna-Combination-Pizza-Hut-And-Taco-Bell", { formats: [ 'mp3' ] });
- 
-    viewModel.addTrack(new track('NYC', 'Bear Bot', '', 'Electro Pop', '2009', 'tracks/BEARBOT-NYC.mp3', 'audio/mp3', 'images/coolMonkey.png', bear));
-    viewModel.addTrack(new track('Combination of pizza hut and taco bell', 'Valerna', '', 'Electro Pop', '2009', 
-                                       'tracks/Valerna-Combination-Pizza-Hut-And-Taco-Bell.mp3', 'audio/mp3', 'images/coolMonkey.png', valerna));
-
-    viewModel.currentTrack = bear;
-    ko.applyBindings(viewModel);
-        
-
-        $(document).ready(function(){
-
-          // todo: begging to be wrapped in a nice pattern chain of responsability
-        var runner = new ChainManager({});
-        runner.addChainStep(new ValidateBuzzSuportStep());
-        runner.addChainStep(new SetBuzzOptionsStep());
-        runner.addCompleteHandler(function(isSuccessful, message) {
-          if(isSuccessful){
-            alert('chain successfull');
-          }else{
-            var logMessage = "Couldn't complete bootstrap sequence: " + message;
-            alert(logMessage);
-          }
-        });
-        runner.processChain();
-        });
-
-      </script>
     </section> <!-- hidden -->
 
     <footer>
