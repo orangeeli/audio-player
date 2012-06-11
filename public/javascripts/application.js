@@ -238,7 +238,6 @@ var SetViewModelHandler = AbstractHandler.extend({
         sound : trackSound
       }
     }
-    
 
     var changeTrackObj = {
       changeTrackPrev : function(playCounter, clb){
@@ -268,10 +267,10 @@ var SetViewModelHandler = AbstractHandler.extend({
 
     var viewModel = {
       play : function(){
-        this.currentTrack.sound.play();
+        this.currentTrack().sound.play();
       },
       stop : function(){
-        this.currentTrack.sound.stop();
+        this.currentTrack().sound.stop();
       },
       rewind : function(){alert('rewind!')},
       forward : function(){alert('forward!')},
@@ -301,7 +300,7 @@ var SetViewModelHandler = AbstractHandler.extend({
       removeTrack : function(){
         this.playlist.pop(track);
       },
-      /*currentTrack : ko.observable(),*/
+      currentTrack : ko.observable(),
       changeTrack : function(f, pos){
         var trackNumber = typeof f == "function" ? f(): pos;
         if(typeof trackNumber == "undefined"){
@@ -310,14 +309,15 @@ var SetViewModelHandler = AbstractHandler.extend({
         }
         // stop current music
         this.stop();
-        this.currentTrack = this.playlist[trackNumber];
+
+        this.currentTrack(this.playlist[trackNumber]);
         this.playerCounter = trackNumber;
         // start playing new one if it was playing some previously
         this.play();
       }
     };
 
-    viewModel.currentTrack = ko.observable();
+    //viewModel.currentTrack = ko.observable();
 
     var bear = new buzz.sound("tracks/BEARBOT-NYC", { formats: [ 'mp3' ] });
     var valerna = new buzz.sound("tracks/Valerna-Combination-Pizza-Hut-And-Taco-Bell", { formats: [ 'mp3' ] });
@@ -330,6 +330,15 @@ var SetViewModelHandler = AbstractHandler.extend({
       $('body').trigger("trackEnded");
     });
 
+    bear.bind("timeupdate", function(e) {
+      //var timer = buzz.toTimer(this.getTime());
+      //document.getElementById("timer").innerHTML = timer;
+      var percentage = this.getPercent();
+      //$('#slider').val(percentage);
+      //$('#slider_2').val(percentage);
+      //$('#slider_3').val(percentage);
+    });
+    
     $('body').bind('trackEnded', function(){
       if(viewModel.continuousPlay){
         viewModel.next();
@@ -343,7 +352,8 @@ var SetViewModelHandler = AbstractHandler.extend({
     viewModel.addTrack(bearTrack);
     viewModel.addTrack(valernaTrack);
 
-    viewModel.currentTrack = bearTrack;
+    viewModel.currentTrack(bearTrack);
+
     ko.applyBindings(viewModel);
     this.processNext();
   }

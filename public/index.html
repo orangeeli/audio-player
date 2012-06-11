@@ -16,6 +16,7 @@
     <link rel="stylesheet" type="text/css" href="stylesheets/audio-player.css" />
   </head>
   <body>
+
     <section id="container">
       <header>
         Audio player
@@ -34,15 +35,19 @@
 
             <article id="name" class="info_text">
               <label for="name_value_field">Name:&nbsp;&nbsp;</label>
-              <span id="name_value_field" class="value_field" data-bind="text: currentTrack.name"></span>
+              <span id="name_value_field" class="value_field" data-bind="text: currentTrack().name"></span>
+            </article>
+            <article id="artist" class="info_text">
+              <label for="artist_value_field">Artist:&nbsp;&nbsp;</label>
+              <span id="artist_value_fied" class="value_field" data-bind="text: currentTrack().artist"></span>
             </article>
             <article id="album" class="info_text">
               <label for="album_value_field">Album:&nbsp;&nbsp;</label>
-              <span id="album_value_fied" class="value_field" data-bind="text: currentTrack.album"></span>
+              <span id="album_value_fied" class="value_field" data-bind="text: currentTrack().album"></span>
             </article>
             <article id="genre" class="info_text">
               <label for="genre_value_field">Genre:&nbsp;&nbsp;</label>
-              <span id="genre_value_field" class="value_field" data-bind="text: currentTrack.genre"></span>
+              <span id="genre_value_field" class="value_field" data-bind="text: currentTrack().genre"></span>
             </article>
             <!--article id="length" class="info_text">
               <label for="length_value_field">Length:&nbsp;&nbsp;</label>
@@ -50,23 +55,114 @@
             </article-->
             <article id="year" class="info_text">
               <label for="year_value_field">Year:&nbsp;&nbsp;</label>
-              <span id="year_value_field" class="value_field" data-bind="text: currentTrack.year"></span>
+              <span id="year_value_field" class="value_field" data-bind="text: currentTrack().year"></span>
             </article>
 
           </article>
 
         </section> <!-- audio details and info -->
+        
         <section id="player">
           <section id="audio_stuff">
             <!--audio controls="controls">
               Your browser does not support the audio element.
             </audio-->
-            <!--audio controls="controls" data-bind="template: {name:'playlistTemplate', foreach:playlist}">
+            <audio controls="controls" data-bind="template: {name:'playlistTemplate', foreach:playlist}">
               Your browser does not support the audio element.
-            </audio-->
+            </audio>
             <!--script id="playlistTemplate" type="text/x-jquery-tmpl">
               <source src="${$data.url}" type="${$data.type}" />
             </script-->
+
+              <div id="player_controls_container">
+                <ul id="player_controls">
+                  <li>
+  		    <button data-bind="click: previous" id="previous_track_button" class="player_button">
+		      <svg xmlns:svg="http://www.w3.org/2000/svg"
+		        xmlns="http://www.w3.org/2000/svg" 
+                        viewBox="0 0 25 25"
+			width="25px" height="25px" style="background: #f0f0f0;">
+        		<defs>
+			  <style type="text/css">
+   		            <![CDATA[
+			      #play{background: #a0a0a0;}
+			    ]]>
+ 		          </style>
+ 			</defs>
+			  <g transform="scale(.8) translate(0,3)">
+			    <g transform="rotate(180) translate(-25,-20)">
+			      <polygon id="play" points="0,0 12,10 0,20 0,0" />
+			      <polygon id="play" points="0,0 12,10 0,20 0,0" transform="translate(12,0)" />
+			    </g>
+			  </g>
+		      </svg>
+                    </button>
+                  </li>
+		  <li>
+                    <button data-bind="click: play" id="play_track_button" class="player_button">
+ 		      <svg xmlns:svg="http://www.w3.org/2000/svg"
+		        xmlns="http://www.w3.org/2000/svg" 
+                        viewBox="0 0 25 25"
+			width="25px" height="25px" style="background: #f0f0f0;">
+        		<defs>
+			  <style type="text/css">
+   		            <![CDATA[
+			      #play{background: #a0a0a0;}
+			      g{background: transparent;}
+			      line{stroke:rgb(0,0,0);stroke-width:3}
+			      .hidden{display: none;}
+			    ]]>
+ 		          </style>
+ 			</defs>
+			  <g transform="scale(1) translate(6,0)">
+ 			    <g tranform="translate(6, 12.5)">
+			      <polygon id="play" points="0,0 12,10 0,20 0,0" />
+			      <g transform="translate(2,0)">
+  			        <line x1="0" y1="0" x2="0" y2="20" class="hidden" />
+			        <line x1="5" y1="0" x2="5" y2="20" class="hidden" />
+			      </g>
+			    </g>
+			  </g>
+		      </svg>
+                    </button>
+                  </li>
+  		  <li>
+                    <button data-bind="click: next" id="next_track_button" class="player_button">
+		      <svg xmlns:svg="http://www.w3.org/2000/svg"
+		        xmlns="http://www.w3.org/2000/svg" 
+                        viewBox="0 0 25 25"
+			width="25px" height="25px" style="background: #f0f0f0;">
+        		<defs>
+			  <style type="text/css">
+   		            <![CDATA[
+			      #play{background: #a0a0a0;}
+			    ]]>
+ 		          </style>
+ 			</defs>
+			  <g transform="scale(.8) translate(0,3)">
+			    <polygon id="play" points="0,0 12,10 0,20 0,0" />
+			    <polygon id="play" points="0,0 12,10 0,20 0,0" transform="translate(12,0)" />
+			  </g>
+		      </svg>
+		    </button>
+ 		  </li>
+                  
+                </ul>
+              </div>
+              <div id="track_container">
+                <div id="track" class="box_it">
+                  <div id="track_load" class="box_it">
+ 		  </div>
+                  <div id="track_progress" class="box_it">
+                  </div>
+                </div>
+              </div>
+              <div id="time_info">
+              </div>
+
+            <!--input id="slider" type="range" min="0" max="100" step="1" value="0" /-->
+            <!--progress id="slider_2" value="0" max="100"></progress-->
+            <!--meter id="slider_3" min="0" max="100" low="40" high="90" optimum="100" value="0">A+</meter-->
           </section>
           <section id="controls">
             <ul>
